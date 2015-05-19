@@ -14,7 +14,8 @@ const int REED_OUT = 10;
 
 int simon_level = 3;
 int entered_buttons = 0;
-int target_sequence[15];
+const int game_length = 15;
+int target_sequence[game_length];
 
 void setup() {
   pinMode( CIRCLE_SWITCH, INPUT );
@@ -32,8 +33,12 @@ void setup() {
   pinMode( REED_OUT, OUTPUT );
 
   Serial.begin(9600);
-  delay(3000);
+  randomSeed( analogRead(0) );
 
+  digitalWrite( REED_OUT, HIGH );
+  delay(100);
+  digitalWrite( REED_OUT, LOW);
+  delay(1000);
   restartGame();
 }
 
@@ -59,7 +64,7 @@ void loop() {
     }
   }
 
-  if( entered_buttons == 15 )
+  if( entered_buttons == game_length )
     win();
 
   if( entered_buttons == simon_level )
@@ -117,11 +122,11 @@ void levelUp() {
   Serial.println("Level up");
   delay(1000);
   simon_level++;
-  setSequence();
+  entered_buttons = 0;
+  playSequence();
 }
 
 void restartGame() {
-
   Serial.println("Restart Game");
 
   delay(1500);
@@ -135,7 +140,7 @@ void setSequence() {
   Serial.println("Set Sequence");
 
   entered_buttons = 0;
-  for( int x=0; x<simon_level; x++) {
+  for( int x=0; x<game_length; x++) {
     target_sequence[x] = (random(4) + 1)*2;
     Serial.print(String(target_sequence[x]) + " ");
   }
